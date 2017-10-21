@@ -31,7 +31,7 @@ class SetActivity : AppCompatActivity() {
     private fun fetchSets(setAdapter: SetAdapter) {
         doAsync {
             val setsResponse: Response<List<MtgSet>> = MtgSetApiClient.getAllSets()
-            val sets = setsResponse.body() ?: mutableListOf<MtgSet>()
+            val sets = setsResponse.body() ?: mutableListOf()
             val sortedSets = sets.sortedBy { it.releaseDate }.reversed()
             uiThread {
                 setAdapter.add(sortedSets)

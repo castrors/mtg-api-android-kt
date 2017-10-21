@@ -42,17 +42,16 @@ class BoosterActivity : AppCompatActivity() {
         recyclerView.layoutManager = layoutManager
 
 
-        fetchCards(setCode, cardsAdapter, this)
+        fetchCards(setCode, cardsAdapter)
     }
 
 
-    private fun fetchCards(setCode: String, cardsAdapter: BoosterAdapter, context: Context) {
+    private fun fetchCards(setCode: String, cardsAdapter: BoosterAdapter) {
         doAsync {
             val cardsResponse: Response<List<MtgCard>> = MtgSetApiClient.generateBoosterPackBySetCode(setCode)
-            val cards = cardsResponse.body()
+            val cards = cardsResponse.body() ?: mutableListOf()
             uiThread {
-                toast("success")
-                cards?.let { cardsAdapter.add(cards) }
+                cardsAdapter.add(cards)
             }
         }
     }
