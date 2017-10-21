@@ -9,19 +9,20 @@ import android.support.v7.widget.RecyclerView.Adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import io.magicthegathering.kotlinsdk.model.set.MtgSet
-import kotlinx.android.synthetic.main.card_item.view.*
+import com.squareup.picasso.Picasso
+import io.magicthegathering.kotlinsdk.model.card.MtgCard
+import kotlinx.android.synthetic.main.card_item_with_image.view.*
 
-class SetAdapter(private val sets: MutableList<MtgSet>,
+class BoosterAdapter(private val sets: MutableList<MtgCard>,
                  private val context: Context,
-                 private val listener: (MtgSet) -> Unit) : Adapter<SetAdapter.ViewHolder>() {
+                 private val listener: (MtgCard) -> Unit) : Adapter<BoosterAdapter.ViewHolder>() {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(sets[position], listener)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(context).inflate(R.layout.card_item, parent, false)
+        val view = LayoutInflater.from(context).inflate(R.layout.card_item_with_image, parent, false)
         return ViewHolder(view)
     }
 
@@ -32,15 +33,17 @@ class SetAdapter(private val sets: MutableList<MtgSet>,
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val name = itemView.card_item_name
         val description = itemView.card_item_description
+        val image = itemView.card_item_image
 
-        fun bind(set: MtgSet, listener: (MtgSet) -> Unit) = with(itemView) {
-            name.text = set.name
-            description.text = set.code
-            setOnClickListener{ listener(set)}
+        fun bind(card: MtgCard, listener: (MtgCard) -> Unit) = with(itemView) {
+            name.text = card.name
+            description.text = card.text
+            Picasso.with(context).load(card.imageUrl).into(image)
+            setOnClickListener{ listener(card)}
         }
     }
 
-    fun add(newSets: List<MtgSet>) {
+    fun add(newSets: List<MtgCard>) {
         sets.addAll(newSets)
         notifyDataSetChanged()
     }

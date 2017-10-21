@@ -9,12 +9,12 @@ import android.support.v7.widget.RecyclerView.Adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import io.magicthegathering.kotlinsdk.model.card.MtgCard
+import io.magicthegathering.kotlinsdk.model.set.MtgSet
 import kotlinx.android.synthetic.main.card_item.view.*
 
-class BoosterAdapter(private val cards: MutableList<MtgCard>,
+class SetAdapter(private val cards: MutableList<MtgSet>,
                      private val context: Context,
-                     private val listener: (MtgCard) -> Unit) : Adapter<BoosterAdapter.ViewHolder>() {
+                     private val listener: (MtgSet) -> Unit) : Adapter<SetAdapter.ViewHolder>() {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(cards[position], listener)
@@ -33,14 +33,14 @@ class BoosterAdapter(private val cards: MutableList<MtgCard>,
         val name = itemView.card_item_name
         val description = itemView.card_item_description
 
-        fun bind(card: MtgCard, listener: (MtgCard) -> Unit) = with(itemView) {
+        fun bind(card: MtgSet, listener: (MtgSet) -> Unit) = with(itemView) {
             name.text = card.name
-            description.text = card.text
+            description.text = card.code
             setOnClickListener{ listener(card)}
         }
     }
 
-    fun add(newCards: List<MtgCard>) {
+    fun add(newCards: List<MtgSet>) {
         cards.addAll(newCards)
         notifyDataSetChanged()
     }

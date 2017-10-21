@@ -7,7 +7,6 @@ import io.magicthegathering.kotlinsdk.api.MtgSetApiClient
 import io.magicthegathering.kotlinsdk.model.set.MtgSet
 import kotlinx.android.synthetic.main.recycler_view.*
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.toast
 import org.jetbrains.anko.uiThread
 import retrofit2.Response
 
@@ -19,7 +18,6 @@ class SetActivity : AppCompatActivity() {
 
         val recyclerView = recyclerView
         val setAdapter = SetAdapter(mutableListOf<MtgSet>(), this) {
-            toast("${it.name} Clicked")
             val intent = BoosterActivity.newIntent(this, it.code)
             startActivity(intent)
         }
@@ -33,10 +31,10 @@ class SetActivity : AppCompatActivity() {
     private fun fetchSets(setAdapter: SetAdapter) {
         doAsync {
             val setsResponse: Response<List<MtgSet>> = MtgSetApiClient.getAllSets()
-            val sets = setsResponse.body()
+            val sets = setsResponse.body() ?: mutableListOf<MtgSet>()
+            val sortedSets = sets.sortedBy { it.releaseDate }.reversed()
             uiThread {
-                toast("success")
-                sets?.let { setAdapter.add(sets) }
+                setAdapter.add(sortedSets)
             }
         }
     }

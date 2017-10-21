@@ -30,6 +30,7 @@ dependencies {
 
     implementation 'org.jetbrains.anko:anko:0.10.2'
     implementation 'io.magicthegathering:kotlinsdk:1.0.1'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
