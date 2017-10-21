@@ -9,19 +9,15 @@ import android.support.v7.widget.RecyclerView.Adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import io.magicthegathering.kotlinsdk.model.card.MtgCard
+import io.magicthegathering.kotlinsdk.model.set.MtgSet
 import kotlinx.android.synthetic.main.card_item.view.*
 
-class MyAdapter(private val cards: MutableList<MtgCard>,
-                private val context: Context) : Adapter<MyAdapter.ViewHolder>() {
+class SetAdapter(private val sets: MutableList<MtgSet>,
+                 private val context: Context,
+                 private val listener: (MtgSet) -> Unit) : Adapter<SetAdapter.ViewHolder>() {
 
-    override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        val card = cards[position]
-        holder?.let {
-            holder.name.text = card.name
-            holder.description.text = card.text
-        }
-
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(sets[position], listener)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
@@ -30,24 +26,22 @@ class MyAdapter(private val cards: MutableList<MtgCard>,
     }
 
     override fun getItemCount(): Int {
-        return cards.size
+        return sets.size
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val name = itemView.card_item_name
         val description = itemView.card_item_description
 
-        fun bindView(card: MtgCard) {
-            val name = itemView.card_item_name
-            val description = itemView.card_item_description
-
-            name.text = card.name
-            description.text = card.text
+        fun bind(set: MtgSet, listener: (MtgSet) -> Unit) = with(itemView) {
+            name.text = set.name
+            description.text = set.code
+            setOnClickListener{ listener(set)}
         }
     }
 
-    fun add(newCards: List<MtgCard>) {
-        cards.addAll(newCards)
+    fun add(newSets: List<MtgSet>) {
+        sets.addAll(newSets)
         notifyDataSetChanged()
     }
 
