@@ -4,14 +4,18 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
+import android.view.View
+import android.widget.ProgressBar
+import com.yuyakaido.android.cardstackview.CardStackView
+import com.yuyakaido.android.cardstackview.SwipeDirection
 import io.magicthegathering.kotlinsdk.api.MtgSetApiClient
 import io.magicthegathering.kotlinsdk.model.card.MtgCard
-import kotlinx.android.synthetic.main.recycler_view.*
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.toast
+import org.jetbrains.anko.find
 import org.jetbrains.anko.uiThread
 import retrofit2.Response
+
 
 class BoosterActivity : AppCompatActivity() {
 
@@ -26,32 +30,72 @@ class BoosterActivity : AppCompatActivity() {
         }
     }
 
+    var progressBar: ProgressBar? = null
+    var cardStackView: CardStackView? = null
+    var adapter: BoosterAdapter? = null
+
+    var items: MutableList<MtgCard> = mutableListOf()
+    var lastItem: MtgCard? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.recycler_view)
+        setContentView(R.layout.activity_booster)
 
         val setCode = intent.getStringExtra(SET_CODE)
                 ?: throw IllegalStateException("field $SET_CODE missing in Intent")
-
-        val recyclerView = recyclerView
-        val cardsAdapter = BoosterAdapter(mutableListOf<MtgCard>(), this) {
-            toast("${it.name} Clicked")
-        }
-        recyclerView.adapter = cardsAdapter
-        val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        recyclerView.layoutManager = layoutManager
-
-
-        fetchCards(setCode, cardsAdapter)
+        setup()
+        fetchCards(setCode)
     }
 
+    private var count: Int = 0
 
-    private fun fetchCards(setCode: String, cardsAdapter: BoosterAdapter) {
+    private fun setup() {
+        progressBar = find(R.id.activity_booster_progress_bar)
+        cardStackView = find(R.id.activity_booster_card_stack_view)
+        cardStackView?.reverse()
+
+        cardStackView?.setCardEventListener(object : CardStackView.CardEventListener {
+            override fun onCardDragging(percentX: Float, percentY: Float) {
+                Log.d("CardStackView", "onCardDragging")
+            }
+
+            override fun onCardSwiped(direction: SwipeDirection) {
+                Log.d("CardStackView", "onCardSwiped: " + direction.toString())
+                Log.d("CardStackView", "topIndex: " + cardStackView?.topIndex)
+                count = count + 1
+                if(count == 15){
+                    adapter?.addAll(items)
+                    adapter?.notifyDataSetChanged()
+                    count = 0
+                }
+            }
+
+            override fun onCardReversed() {
+                Log.d("CardStackView", "onCardReversed")
+            }
+
+            override fun onCardMovedToOrigin() {
+                Log.d("CardStackView", "onCardMovedToOrigin")
+            }
+
+            override fun onCardClicked(index: Int) {
+                Log.d("CardStackView", "onCardClicked: " + index)
+            }
+        })
+    }
+
+    private fun fetchCards(setCode: String) {
+        cardStackView?.visibility = View.GONE
+        progressBar?.visibility = View.VISIBLE
+        adapter = BoosterAdapter(this)
         doAsync {
             val cardsResponse: Response<List<MtgCard>> = MtgSetApiClient.generateBoosterPackBySetCode(setCode)
             val cards = cardsResponse.body() ?: mutableListOf()
+            items = cards as MutableList<MtgCard>
             uiThread {
-                cardsAdapter.add(cards)
+                adapter?.addAll(cards)
+                cardStackView?.setAdapter(adapter)
+                cardStackView?.visibility = View.VISIBLE
+                progressBar?.visibility = View.GONE
             }
         }
     }

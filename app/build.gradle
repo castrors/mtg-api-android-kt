@@ -6,7 +6,7 @@ apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "com.castrodev.mtgapi"
         minSdkVersion 15
@@ -31,6 +31,7 @@ dependencies {
     implementation 'org.jetbrains.anko:anko:0.10.2'
     implementation 'io.magicthegathering:kotlinsdk:1.0.1'
     implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation "com.yuyakaido.android:card-stack-view:1.0.0-beta7"
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {

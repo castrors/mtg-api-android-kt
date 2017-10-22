@@ -4,48 +4,55 @@ package com.castrodev.mtgapi
  * Created by rodrigocastro on 19/10/17.
  */
 import android.content.Context
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.RecyclerView.Adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.ImageView
 import com.squareup.picasso.Picasso
 import io.magicthegathering.kotlinsdk.model.card.MtgCard
-import kotlinx.android.synthetic.main.card_item_with_image.view.*
+import org.jetbrains.anko.find
 
-class BoosterAdapter(private val sets: MutableList<MtgCard>,
-                 private val context: Context,
-                 private val listener: (MtgCard) -> Unit) : Adapter<BoosterAdapter.ViewHolder>() {
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(sets[position], listener)
-    }
+class BoosterAdapter(context: Context) :
+        ArrayAdapter<MtgCard>(context, 0) {
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(context).inflate(R.layout.card_item_with_image, parent, false)
-        return ViewHolder(view)
-    }
+    override fun getView(position: Int, contentView: View?, parent: ViewGroup): View? {
+        var holder: ViewHolder
+        var view: View? = null
 
-    override fun getItemCount(): Int {
-        return sets.size
-    }
+        if (contentView == null) {
+            val inflater = LayoutInflater.from(context)
+            view = inflater.inflate(R.layout.card_item_with_image, parent, false)
+            holder = ViewHolder(view)
 
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val name = itemView.card_item_name
-        val description = itemView.card_item_description
-        val image = itemView.card_item_image
-
-        fun bind(card: MtgCard, listener: (MtgCard) -> Unit) = with(itemView) {
-            name.text = card.name
-            description.text = card.text
-            Picasso.with(context).load(card.imageUrl).into(image)
-            setOnClickListener{ listener(card)}
+            view.setTag(holder)
+        } else {
+            holder = contentView.tag as ViewHolder
         }
+
+        val card: MtgCard = getItem(position)
+
+//        holder.name.text = card.name
+//        holder.description.text = card.text
+        Picasso.with(context).load(card.imageUrl).into(holder.image)
+
+        return view
     }
 
-    fun add(newSets: List<MtgCard>) {
-        sets.addAll(newSets)
+    fun shiftLastToBottom(cards: List<MtgCard>){
+        val switftedCards : MutableList<MtgCard> = mutableListOf()
+        switftedCards.addAll(cards.subList(1,cards.size))
+        switftedCards.add(cards[0])
+        addAll(switftedCards)
         notifyDataSetChanged()
+    }
+
+    class ViewHolder(view: View) {
+//        var name = view.find<TextView>(R.id.item_card_name)
+//        var description = view.find<TextView>(R.id.item_card_description)
+        var image = view.find<ImageView>(R.id.item_card_image)
+
     }
 
 }
